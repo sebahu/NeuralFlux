@@ -1,0 +1,16 @@
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+
+#SBATCH --cpus-per-task=32
+#SBATCH --mem=310G
+#SBATCH --time=00-23:00
+
+# #SBATCH --chdir=/work/%u/nn-inst-mfa # working directory of the job, adapt accordingly
+#SBATCH --mail-type=NONE              # no mail notifications
+#SBATCH --output=logs/handle-simulate-%j.out        # standard out of the job into this file (also stderr)
+
+module purge
+module load math/MATLAB/2021a
+
+matlab -batch "workflowHandleSimulateResults('$1')"

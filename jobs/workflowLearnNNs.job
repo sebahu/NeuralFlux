@@ -1,0 +1,16 @@
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+
+#SBATCH --cpus-per-task=24
+#SBATCH --mem=80G
+#SBATCH --time=01-05:00
+
+# #SBATCH --chdir=/work/%u/nn-inst-mfa # working directory of the job, adapt accordingly
+#SBATCH --mail-type=NONE              # no mail notifications
+#SBATCH --output=logs/learnNNs-%j.out        # standard out of the job into this file (also stderr)
+
+module purge
+module load math/MATLAB/2021a
+
+matlab -batch "workflowLearnNNs('$1',$2,$3)"

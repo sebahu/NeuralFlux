@@ -1,0 +1,5 @@
+# this file is meant to be sourced
+config_matlab="configMinTest" # the content must fit to this file
+slots_per_job=1
+num_slots=3 # must fit to value in config_matlab - file
+num_mids_to_learn=25 # must fit to mid_name_input-array in config_matlab - file

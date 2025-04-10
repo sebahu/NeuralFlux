@@ -1,0 +1,23 @@
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --ntasks=6
+
+#SBATCH --cpus-per-task=2
+#SBATCH --mem=12G
+#SBATCH --time=01-06:00
+
+# #SBATCH --chdir=/work/%u/nn-inst-mfa # working directory of the job, adapt accordingly
+#SBATCH --mail-type=NONE              # no mail notifications
+#SBATCH --output=logs/simulate-%j.out        # standard out of the job into this file (also stderr)
+
+pwd
+
+module purge
+module load math/MATLAB/2021a
+
+for slot in $(seq $2 2 $3)
+do
+echo $slot $(($slot+1))
+srun --ntasks=1 --cpus-per-task=2 --mem=2G matlab -batch "workflowSimulate('$1',$slot,$(($slot+1)))" &
+done
+wait
