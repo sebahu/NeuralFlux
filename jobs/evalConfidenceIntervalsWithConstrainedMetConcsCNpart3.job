@@ -1,0 +1,19 @@
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+
+#SBATCH --cpus-per-task=32
+#SBATCH --mem=128G
+#SBATCH --time=02-13:00
+
+# #SBATCH --chdir=/work/%u/nn-inst-mfa # working directory of the job, adapt accordingly
+#SBATCH --mail-type=NONE              # no mail notifications
+#SBATCH --output=logs/sample-%j.out        # standard out of the job into this file (also stderr)
+
+module purge
+module load math/MATLAB/2021a
+
+for rxn in 226 239 260 295 351 374 382 385 388 400 411 415 469 476 527 622 643
+do
+matlab -batch "evalConfidenceIntervalsWithConstrainedMetConcs2('configAraCoreC','configAraCoreN',$1, $rxn )"
+done
