@@ -12,7 +12,7 @@ workflowUniversal.m: Matlab script, executing the whole workflow. Parameters: co
 When workflowUniversal is executed, no paralleization takes place. This is only usable as a test run for the pipeline on a minimal config
 
 A single command, to test the pipeline up to the neural network training:
-matlab -batch "workflowUniversal('configMinTestC','~/apps/gurobi903/linux64/matlab', '~/apps/cobratoolbox')"
+`matlab -batch "workflowUniversal('configMinTestC', '~/apps/gurobi903/linux64/matlab',  '~/apps/cobratoolbox')"`
 
 workflowSample.m; workflowSimulate.m; workflowHandleSimulateResults.m; workflowLearnNNs.m: the individual steps of the workflow, using the same config_script as the overall workflow
 
