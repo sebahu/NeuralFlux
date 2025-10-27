@@ -2,7 +2,7 @@ function [] = workflowUniversal(config_script, gurobi_path, cobra_path)
     addpath("application_core");
     addpath("configs");
     if ~exist('cobra_path', 'var')
-        disp("call with appropriate config and paths, eg. workflowUniversal('configMinTest','~/apps/gurobi903/linux64/matlab', '~/apps/cobratoolbox')");
+        disp("call with appropriate config and paths, eg. workflowUniversal('configMinTestC','~/apps/gurobi903/linux64/matlab', '~/apps/cobratoolbox')");
         return;
     end
 

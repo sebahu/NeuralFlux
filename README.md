@@ -2,7 +2,7 @@
 Neural network based approach to INST-MFA
 NeuralFlux was developed with COBRA toolbox 3.0, Gurobi 9.03 and Matlab 2021a
 
-#Overview of files
+## Overview of files
 ./ (this folder): matlab files to execute (parts of) the workflow to sample fluxdistributions, simulate labeling enrichment for them, and train neural networks with the resulting data.
 
 workflowUniversal.m: Matlab script, executing the whole workflow. Parameters: config_script, gurobi_path, cobra_path
@@ -10,6 +10,9 @@ workflowUniversal.m: Matlab script, executing the whole workflow. Parameters: co
 - gurobi_path: path to matlab frontend of gurobi installation, e.g. '~/apps/gurobi903/linux64/matlab'
 - cobra_path: path to cobra toolbox installation, e.g. '~/apps/cobratoolbox'
 When workflowUniversal is executed, no paralleization takes place. This is only usable as a test run for the pipeline on a minimal config
+
+A single command, to test the pipeline up to the neural network training:
+matlab -batch "workflowUniversal('configMinTestC','~/apps/gurobi903/linux64/matlab', '~/apps/cobratoolbox')"
 
 workflowSample.m; workflowSimulate.m; workflowHandleSimulateResults.m; workflowLearnNNs.m: the individual steps of the workflow, using the same config_script as the overall workflow
 
