@@ -1,22 +1,59 @@
 function [config] = configAraCoreC()
-% no function declaration, the variables are to be imported by the caller
+% the returned value is a mapping containing all needed configuration data
+% this specific config file is matched to the AraCore v2.1 model
 
 % part 1: the model and experiment-specific configuration
+% sampling configuration: sampling is done with different thresholds of
+% maximal biomass production, to cover a wider space of fux distributions
+% num_samples_per_opt_bio_fraction: number of sampled flux distributions for
+%  every configured biomass threshold
 config.num_samples_per_opt_bio_fraction = 50000;
+% opt_bio_fractions: the array of biomass threshold values used for sampling
 config.opt_bio_fractions = [0.3,0.4,0.5,0.575,0.65,0.725,0.8,0.85,0.9,0.925,0.95,0.975];
+% prefixes: name prefix for the files containing the stored samples
 config.prefixes = string(config.opt_bio_fractions*100);
 
+% total_samples: number of samples in total,
+% must equal num_samples_per_opt_bio_fraction * len(opt_bio_fractions),
+% can also be calculated
 config.total_samples = 600000; %num_samples_per_opt_bio_fraction * len(opt_bio_fractions)
+
+% parameters to parallelize the simulation of enrichment for the samples
+% num_slots: in how many slots can the simulation be split (equals the
+% maximum number of parallel jobs, that the simulation can be split into,
+% but one job can execute more than one slot)
 config.num_slots = 6000;
+% slot_size: how many samples are in one simulation slot
+% num_slots * slot_size must equal total_samples
 config.slot_size = 100;
 
+% the biomass production reaction of the model used for sampling
+% IMPORTANT: must be in sync with the model!
 config.biomass_rxn_id = "Bio_opt";
+
+% Enrichment simulation parameters
+% logsPerHour: frquency of possible time points. defines the minimal resolution
+%   of the simulation
 config.logsPerHour = 20;
+% simDurationHours: total duration of simulation
+% simDurationHours * logsPerHour + 1 = tota number of possible timepoints
 config.simDurationHours = 4;
-%config.selected_timepoints = [5,12,23,52,81];
+% selected_timepoints: array of time points, which are stored and used for
+%   neural network training. 1 is the start of simulation, which still has initial values.
 config.selected_timepoints = [3,5,8,12,17,23,37,52,66,81];
+% the assumed natural occurence of labeled atoms (i.e. at starting condition)
 config.atomLabelFraction = 0; % or 0.011 natural abundance or 0.008 - C3 plants have a δ13C of −33 to −24‰.
 
+
+% model_preparation_script: name (without suffix) of the matlab script, 
+%   which will provide the finally used model, 
+%   can provide on an existing model, which is modified.
+%   must be present in the configs folder
+config.model_preparation_script = "prepareAraCoreC";
+
+
+% met_mid_sds: standard deviations of mid fraction measurements per measured metabolite
+%  can be calculated from experimental data or estimated, metabolite ids must be in sync with the model
 config.met_mid_sds = ["2PGA", 0.01
     "6PG", 0.01
     "Ala", 0.01
@@ -47,6 +84,12 @@ config.met_mid_sds = ["2PGA", 0.01
     "Tyr", 0.01
     "Val", 0.01];
 
+% mid_name_input: the EMU MIDs, for which neural networks are trained.
+%   the metabolite part (before the :) must be in sync with the model
+%   the EMU and MI must be in sync with the experiment (which part of the metabolite is measured)
+#   also, all the EMU MIDs here must be part of variable measured_emu_mids
+#   which is part of the prepared model (returned from the model_preparation_script)
+%   pro-tip: this list can be created with code
 config.mid_name_input = [    "2PGA:C#1,C#2,C#3.0"
     "2PGA:C#1,C#2,C#3.1"
     "2PGA:C#1,C#2,C#3.2"
@@ -200,7 +243,10 @@ config.mid_name_input = [    "2PGA:C#1,C#2,C#3.0"
     "Val:C#1,C#2,C#3,C#4,C#5.4"
     "Val:C#1,C#2,C#3,C#4,C#5.5"];
 
+
 % part 2: path and file names for intermediate storage
+% names of files and folders for (temporary) artifacts, must be unique, if no interference
+%  with other setups is wanted
 config.base_dir = fullfile("runtime_data", "run_AraCoreC");
 config.model_file = fullfile(config.base_dir,"preparedAraCore");
 config.samples_dir = fullfile(config.base_dir,"samples");
@@ -212,7 +258,7 @@ config.sample_d_ratios_file = fullfile(config.base_dir,"normalized_met_sample_d_
 config.sample_decomp_ratios_file = fullfile(config.base_dir,"normalized_met_sample_decomp_ratios_mid_AraCoreC.mat");
 config.sample_decomp_d_ratios_file = fullfile(config.base_dir,"normalized_met_sample_decomp_d_ratios_mid_AraCoreC.mat");
 config.NN_output_dir = fullfile(config.base_dir,"NN_araCore");
-config.model_preparation_script = "prepareAraCoreC";
+
 config.all_result_data_file = "all_result_dataC.mat";
 config.ci_results_dir = "results_ciC";
 
