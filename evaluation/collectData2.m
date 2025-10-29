@@ -1,9 +1,9 @@
-%function [error] = createFiguresForTestSamples(config_script_NN, config_script_testsamples, ...
-%                                   config_script_NN2, config_script_testsamples2, rng_start, start_is, end_is)
+function [error] = collectData2(config_script_NN, config_script_testsamples, ...
+                                   config_script_NN2, config_script_testsamples2, rng_start, start_is, end_is)
 
 error = 0;
 if ~exist('config_script_testsamples', 'var')
-    disp("call with appropriate configs eg. createFiguresForTestSamples('configAraCoreC','configEvalTestSamplesC')");
+    disp("call with appropriate configs eg. collectData2('configAraCoreC','configEvalTestSamplesC')");
     error = -1;
     return;
 end

@@ -49,6 +49,70 @@ and matlab scripts, that provide a metabolic model with all needed information
 The other files are configuration files or provide a model for other scenarios
 
 ## evaluation
+This folder contains scripts used in the proof-of-concept evaluation of NeuralFlux
+
+### The proof-of-concept
+The proof-of-concepts first sees the creation of the neural netwoprk sets for
+AraCore v2.1 for carbon and nitrogen mapping, using the same sampled flux distributions
+and metabolite concentration distributions. As a result then exist:
+- 600k sampled flux and compartmentalized metabolite concentration distributions
+- simulated 13C and 15N labeling enrichment for the samples
+- Neural networks to predict the 13C and 15N enrichments
+
+As the next step, additional test flux and compartmentalized distributions are created, with slightly different settings
+then for the training data, to guarantee total independence of the two sets of samples.
+For those test samples, 13C and 15N enrichment is simulated.
+
+In the flux estimation step, the starting values are derived from the 600k sampled flux distributions which have the closest enrichment
+values to the "measured" enrichment values.
+To facilitate an efficient evaluation, this calculation is done for all sampled test flux distributions and the indices of the 1000 closest
+orignal samples are stored.
+
+The flux estimation for the whole flux distribution is done for 100 pseudo-randomly selected
+test flux distributions. The results are compared to calculate the correlation
+between estimated and true value for all reactions.
+
+From the reactions with high correlation, a representaive selection of reactions, which are not pairwise fully coupled
+to any of the other selected reactions, is used for the confidence interval calculation.
+
+From the 100 pseudo-randomly selected test samples, 5 are selected, that have low pairwise correlation with each other.
+For these reaction/test sample pairs, the confidence intervals are calculated.
+
+
+
+### The scripts
+
+- evalEstimatesForTestSamplesWithConstrainedMetConcs2.m: calculates flux estimations for all reactions (i.e. a whole flux distribution)
+for a set of test samples, selected pseudo-randomly from all test samples. It combines 13C and 15N labeling data.
+
+    - collect all the neural networks
+    - get starting values as a combination of the closest matches from the original 600k samples.
+    - create function which calls the neural networks to get the enrichment values for the given parameters 
+      (i.e. the current estimate for the flux values and compartmentalized metabolite concentrations) and implements barrier
+      functions to keep the metabolite concentrations in the limits given by the measured absolute concentrations
+    - call lsqnonlin with this function to perform the parameter optimization
+    
+
+- evalConfidenceIntervalsWithConstrainedMetConcs2.m: calculates the confidence intervals for one reaction of one test sample.
+  the reaction is encoded by its rank in the correlation analysis of the previous step, and the test sample is identified
+  by its position in the pseudo-random sorted test samples
+
+
+collectData2.m
+collectData.m
+evalConfidenceIntervalsWithConstrainedMetConcs.m
+evalEstimatesForTestSamplesWithConstrainedMetConcs2.m
+evalEstimatesForTestSamplesWithConstrainedMetConcs.m
+evalEstimatesForTestSamplesWithKnownCompMetConcs2.m
+evalEstimatesForTestSamplesWithKnownCompMetConcsC.m
+evalEstimatesForTestSamplesWithKnownCompMetConcs.m
+evalEstimatesForTestSamplesWithKnownCompMetConcsN.m
+evalMetConfidenceIntervalsWithConstrainedMetConcs2.m
+evalMetConfidenceIntervalsWithConstrainedMetConcs.m
+prepareEstimatesForTestSamples2.m
+prepareEstimatesForTestSamples.m
+
+
 
 
 
@@ -58,8 +122,25 @@ The other files are configuration files or provide a model for other scenarios
 
 
 ## jobs
+Slurm jobs that facilitate the parallization of the computational expensive
+steps of the workflow on HPC nodes.
 
+- start_workflow_jobs.sh, start_workflow_jobs_after_sampling.sh: shell scripts, that launch
+  slurm jobs for the workflow to create the samples, simulate them and train neural networks for
+  one experimental setup. The few parallelization parameters are stored in additional
+  shell scripts (config...sh, ih the same folder), that are sourced
 
+- configAraCoreC.sh, configAraCoreN.sh, configEvalTestSamplesC.sh, configMinTestC.sh, configMinTest.sh:
+  config shell scripts for the accordingly named matlab configuration scripts from the config folder
+
+- workflowSample.job, workflowSimulate.job, workflowHandleSimulateResults.job, workflowLearnNNs.job:
+  slurm jobs to execute one of the steps of the NeuralFlux workflow (matlab scripts of the main folder)
+  with the same parameters regarding the configuration and additional parallization paramters
+
+- evalConfidenceIntervalsWithConstrainedMetConcsCNpart3.job:
+  slurm job to execute a confidence interval calculation for a preselection of reactions, for one
+  flux distribution of the test samples. Used for the proof-of-concept. The reactions were selected
+  after a best flux estimation for 100 test flux distributions and then a correlation analysis
 
 ## models
 Data needed for the models used in NeuralFlux model preparation scripts.
